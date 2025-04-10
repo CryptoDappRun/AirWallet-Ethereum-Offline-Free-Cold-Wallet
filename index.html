@@ -122,8 +122,8 @@
     <div for="cryptoSelector">Send Ether or Token offline-using the safest method</div>
     <br>
     <img id="CoinLogoID" class="m-2 rounded" style="width: 30px; height: 30px;"/>
-    <label for="cryptoSelector">Select a Blockchain:</label>
-    <select id="cryptoSelector" class="form-control">
+    <label for="cryptoSelector" >Select a Blockchain:</label>
+    <select id="cryptoSelector" onchange="handleCryptoChange(this)" class="form-control">
      
     </select>
 
@@ -159,6 +159,14 @@
         <input type="text" class="form-control" id="fromAddress" placeholder="Your Sender Address" required>
         <span id="BalanceOfEtherID" style="color: green;"></span>
       </div>
+
+            <div class="mb-3">
+        <label for="rpcurl" class="form-label">RPC URL(find it on chainlist.org)</label>
+        <input type="text" class="form-control" id="rpcurlID" placeholder="enter specify RPC URL,use default value if you leave this input empty" required>
+ 
+      </div>
+
+
 
       <div class="mb-3">
         <label for="toAddress" class="form-label">To Address</label>
@@ -956,7 +964,7 @@ var CoinsJson=
   "Polygon": {
     "symbol": "MATIC",
     "chainid": 137,
-    "RPCURL": "https://polygon.llamarpc.com",
+    "RPCURL": "https://rpc-mainnet.matic.quiknode.pro",
     "BroadcastTransaction": "https://polygonscan.com/pushTx",
     "BlockExplorer": "https://polygonscan.com"
   },
@@ -1005,7 +1013,16 @@ selector.trigger('change');
       document.getElementById("SendETHTitle").innerHTML="Send " + selectedCryptoDetails.symbol
 
       GlobalChainID=selectedCryptoDetails.chainid;
-      web3 = new Web3(new Web3.providers.HttpProvider(selectedCryptoDetails.RPCURL));
+
+var USErpcurl=selectedCryptoDetails.RPCURL
+
+if (document.getElementById('rpcurlID').value!==''  && isValidURL(USErpcurl)) {
+	
+  USErpcurl=selectedCryptoDetails.RPCURL
+  console.log('use specified rpcurl.',USErpcurl)
+}
+
+      web3 = new Web3(new Web3.providers.HttpProvider(USErpcurl));
 
       console.log("GlobalChainID:",GlobalChainID)
 
@@ -1025,6 +1042,11 @@ var fromAddressInput = document.getElementById("fromAddress");
 var timeoutId;
 
 fromAddressInput.addEventListener("input", function() {
+   GetEtherBalance()
+  });
+
+
+async function GetEtherBalance() {
     // Clear the previous timer
     clearTimeout(timeoutId);
 
@@ -1052,8 +1074,17 @@ fromAddressInput.addEventListener("input", function() {
 
 
     }, 2000);
-  });
+}
 
+
+function isValidURL(string) {
+  try {
+    const url = new URL(string);
+    return url.protocol === "http:" || url.protocol === "https:";
+  } catch (_) {
+    return false;
+  }
+}
 
 
 
@@ -1110,6 +1141,9 @@ const html5QrCode = new Html5Qrcode("qr-container");
 
 
 
+function handleCryptoChange(selectElement) {
+  GetEtherBalance()
+}
 
 
 
